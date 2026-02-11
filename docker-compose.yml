@@ -44,6 +44,7 @@ services:
       - "8080:8080" # Spark UI
     volumes:
       - ./notebooks:/home/iceberg/notebooks
+      - ./spark-config/spark-defaults.conf:/opt/spark/conf/spark-defaults.conf
     environment:
       # QUAN TRỌNG: Ép Spark dùng Nessie Catalog thay vì REST mặc định
       - SPARK_CONF_spark_sql_catalog_nessie=org.apache.iceberg.spark.SparkCatalog
