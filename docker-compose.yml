@@ -1,0 +1,75 @@
+services:
+  # 1. NƠI LƯU TRỮ (OBJECT STORAGE)
+  minio:
+    image: minio/minio
+    container_name: minio
+    environment:
+      - MINIO_ROOT_USER=admin
+      - MINIO_ROOT_PASSWORD=password
+    ports:
+      - "9000:9000"
+      - "9001:9001"
+    command: server /data --console-address ":9001"
+    volumes:
+      - ./minio-data:/data
+
+  # Tự động tạo bucket 'warehouse' khi khởi động
+  mc:
+    image: minio/mc
+    depends_on:
+      - minio
+    entrypoint: >
+      /bin/sh -c "
+      until (/usr/bin/mc alias set myminio http://minio:9000 admin password) do echo 'Waiting for MinIO...' && sleep 1; done;
+      /usr/bin/mc mb myminio/warehouse || true;
+      exit 0;
+      "
+
+  # 2. THỦ THƯ (CATALOG MANAGEMENT)
+  nessie:
+    image: projectnessie/nessie:latest
+    container_name: nessie
+    ports:
+      - "19120:19120"
+
+  # 3. BỘ MÁY XỬ LÝ (COMPUTE ENGINE - SPARK)
+  spark:
+    image: tabulario/spark-iceberg
+    container_name: spark
+    depends_on:
+      - minio
+      - nessie
+    ports:
+      - "8888:8888" # Jupyter Lab
+      - "8080:8080" # Spark UI
+    volumes:
+      - ./notebooks:/home/iceberg/notebooks
+    environment:
+      # QUAN TRỌNG: Ép Spark dùng Nessie Catalog thay vì REST mặc định
+      - SPARK_CONF_spark_sql_catalog_nessie=org.apache.iceberg.spark.SparkCatalog
+      - SPARK_CONF_spark_sql_catalog_nessie_uri=http://nessie:19120/api/v1
+      - SPARK_CONF_spark_sql_catalog_nessie_ref=main
+      - SPARK_CONF_spark_sql_catalog_nessie_catalog__impl=org.apache.iceberg.nessie.NessieCatalog
+      - SPARK_CONF_spark_sql_catalog_nessie_warehouse=s3a://warehouse/
+      - SPARK_CONF_spark_sql_catalog_nessie_io__impl=org.apache.iceberg.aws.s3.S3FileIO
+      - SPARK_CONF_spark_hadoop_fs_s3a_endpoint=http://minio:9000
+      - SPARK_CONF_spark_hadoop_fs_s3a_access_key=admin
+      - SPARK_CONF_spark_hadoop_fs_s3a_secret_key=password
+      - SPARK_CONF_spark_hadoop_fs_s3a_path_style_access=true
+      - AWS_ACCESS_KEY_ID=admin
+      - AWS_SECRET_ACCESS_KEY=password
+
+  # 4. TRUY VẤN TỐC ĐỘ CAO (QUERY ENGINE - TRINO)
+  trino:
+    image: trinodb/trino:latest
+    container_name: trino
+    depends_on:
+      - minio
+      - nessie
+    ports:
+      - "8081:8081"
+    environment:
+      - AWS_REGION=us-east-1
+    volumes:
+      # Mount file cấu hình catalog riêng cho Trino
+      - ./trino-config:/etc/trino/catalog
