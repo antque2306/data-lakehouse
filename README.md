@@ -11,3 +11,19 @@ docker exec -it spark spark-sql \
   --conf spark.hadoop.fs.s3a.secret.key=password \
   --conf spark.hadoop.fs.s3a.path.style.access=true \
   --conf spark.sql.defaultCatalog=nessie
+
+## Port Minio
+9000
+9001
+
+## Port Nessie
+19120
+
+## Port Jupyter Lab
+8888
+
+## Port Spark UI
+8090
+
+## Port Trino
+8091

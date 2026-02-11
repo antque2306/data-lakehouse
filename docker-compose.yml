@@ -41,24 +41,10 @@ services:
       - nessie
     ports:
       - "8888:8888" # Jupyter Lab
-      - "8080:8080" # Spark UI
+      - "8090:8080" # Spark UI
     volumes:
       - ./notebooks:/home/iceberg/notebooks
       - ./spark-config/spark-defaults.conf:/opt/spark/conf/spark-defaults.conf
-    environment:
-      # QUAN TRỌNG: Ép Spark dùng Nessie Catalog thay vì REST mặc định
-      - SPARK_CONF_spark_sql_catalog_nessie=org.apache.iceberg.spark.SparkCatalog
-      - SPARK_CONF_spark_sql_catalog_nessie_uri=http://nessie:19120/api/v1
-      - SPARK_CONF_spark_sql_catalog_nessie_ref=main
-      - SPARK_CONF_spark_sql_catalog_nessie_catalog__impl=org.apache.iceberg.nessie.NessieCatalog
-      - SPARK_CONF_spark_sql_catalog_nessie_warehouse=s3a://warehouse/
-      - SPARK_CONF_spark_sql_catalog_nessie_io__impl=org.apache.iceberg.aws.s3.S3FileIO
-      - SPARK_CONF_spark_hadoop_fs_s3a_endpoint=http://minio:9000
-      - SPARK_CONF_spark_hadoop_fs_s3a_access_key=admin
-      - SPARK_CONF_spark_hadoop_fs_s3a_secret_key=password
-      - SPARK_CONF_spark_hadoop_fs_s3a_path_style_access=true
-      - AWS_ACCESS_KEY_ID=admin
-      - AWS_SECRET_ACCESS_KEY=password
 
   # 4. TRUY VẤN TỐC ĐỘ CAO (QUERY ENGINE - TRINO)
   trino:
@@ -68,7 +54,7 @@ services:
       - minio
       - nessie
     ports:
-      - "8081:8081"
+      - "8091:8080"
     environment:
       - AWS_REGION=us-east-1
     volumes:
