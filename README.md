@@ -12,6 +12,11 @@ docker exec -it spark spark-sql \
   --conf spark.hadoop.fs.s3a.path.style.access=true \
   --conf spark.sql.defaultCatalog=nessie
 
+## Run ingest kafka to iceberg
+docker exec -it spark spark-submit \
+  --packages org.apache.spark:spark-sql-kafka-0-10_2.12:3.4.1 \
+  /home/iceberg/notebooks/ingest_kafka_to_iceberg.py
+  
 ## Port Minio
 9000
 9001
@@ -27,3 +32,21 @@ docker exec -it spark spark-sql \
 
 ## Port Trino
 8091
+
+## Giao diện quản lý:
+
+### Spark UI
+localhost:8090
+
+### Trino UI
+localhost:8091
+
+### Kafka UI
+localhost:8080
+
+### MinIO UI
+localhost:9001
+
+### Debezium API
+localhost:8083
+
