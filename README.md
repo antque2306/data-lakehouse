@@ -16,6 +16,8 @@ docker exec -it spark spark-sql \
 docker exec -it spark spark-submit \
   --packages org.apache.spark:spark-sql-kafka-0-10_2.12:3.4.1 \
   /home/iceberg/notebooks/ingest_kafka_to_iceberg.py
+
+podman exec -it spark spark-submit /home/iceberg/notebooks/ingest_kafka_to_iceberg_vneid_hsdd_giay_to.py
   
 ## Port Minio
 9000

@@ -38,7 +38,7 @@ services:
 
   # 3. BỘ MÁY XỬ LÝ (COMPUTE ENGINE - SPARK)
   spark:
-    image: tabulario/spark-iceberg
+    image: spark-iceberg-kafka:latest
     container_name: spark
     networks:
       - debezium_default

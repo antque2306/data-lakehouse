@@ -1,0 +1,23 @@
+CREATE TABLE nessie.bronze_cccd.vneid_hsdd_giay_to (
+    ID bigint,
+    VNEID_HO_SO_ID bigint,
+    LOAI_GIAY_TO bigint,
+    TEN_GIAY_TO string,
+    SO_GIAY_TO string,
+    NGAY_CAP string,
+    NGAY_HET_HAN string,
+    DON_VI_CAP_ID string,
+    HANG string,
+    LOAI_PHUONG_TIEN_ID bigint,
+    BIEN_SO_XE string,
+    NGUOI_TAO string,
+    NGAY_TAO bigint,
+    NGUOI_SUA_CUOI string,
+    NGAY_SUA_CUOI bigint,
+    LOAI_CAP_NHAT int,
+    NGUON_DL string,
+    SO_KHUNG string,
+    DON_VI_CAP_BH string,
+    MAU_BIEN_ID string,
+    op string
+) USING iceberg;
